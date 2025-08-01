@@ -1,0 +1,247 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "contact": {}
+    },
+    "paths": {
+        "/api/v2/client/instrument/balance/{instrumentId}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerToken": []
+                    }
+                ],
+                "description": "Get instrument balance.",
+                "tags": [
+                    "client"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.InstrumentResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v2/client/instrument/create": {
+            "post": {
+                "security": [
+                    {
+                        "BearerToken": []
+                    }
+                ],
+                "description": "Create instrument.",
+                "tags": [
+                    "client"
+                ],
+                "parameters": [
+                    {
+                        "description": "body",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.CreateInstrumentRequestDto"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.CreateInstrumentResponseDto"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v2/client/kafka/topics": {
+            "get": {
+                "security": [
+                    {
+                        "BearerToken": []
+                    }
+                ],
+                "description": "Get active consumer topics.",
+                "tags": [
+                    "client"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v2/client/order/create": {
+            "post": {
+                "security": [
+                    {
+                        "BearerToken": []
+                    }
+                ],
+                "description": "Create order.",
+                "tags": [
+                    "client"
+                ],
+                "parameters": [
+                    {
+                        "description": "body",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.CreateOrderRequestDto"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.CreateOrderResponseDto"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v2/client/user/by/{name}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerToken": []
+                    }
+                ],
+                "description": "Get username.",
+                "tags": [
+                    "client"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.UserResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v2/client/user/get-loss": {
+            "get": {
+                "security": [
+                    {
+                        "BearerToken": []
+                    }
+                ],
+                "description": "Get loss.",
+                "tags": [
+                    "client"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.LossResponse"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "dto.CreateInstrumentRequestDto": {
+            "type": "object",
+            "required": [
+                "instrumentId"
+            ],
+            "properties": {
+                "instrumentId": {
+                    "type": "string",
+                    "example": "0fae8035-7e4b-4f60-b1da-e3752d53f2f4"
+                },
+                "isActive": {
+                    "type": "boolean",
+                    "example": true
+                },
+                "isListed": {
+                    "type": "boolean",
+                    "example": false
+                }
+            }
+        },
+        "dto.CreateInstrumentResponseDto": {
+            "type": "object",
+            "properties": {
+                "instrumentId": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.CreateOrderRequestDto": {
+            "type": "object",
+            "required": [
+                "instrumentId",
+                "side"
+            ],
+            "properties": {
+                "instrumentId": {
+                    "type": "string",
+                    "example": "0fae8035-7e4b-4f60-b1da-e3752d53f2f4"
+                },
+                "price": {
+                    "type": "string",
+                    "example": "100"
+                },
+                "qty": {
+                    "type": "string",
+                    "example": "1"
+                },
+                "side": {
+                    "description": "ask или bid",
+                    "type": "string",
+                    "example": "ask"
+                }
+            }
+        },
+        "dto.CreateOrderResponseDto": {
+            "type": "object",
+            "properties": {
+                "orderId": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.InstrumentResponse": {
+            "type": "object",
+            "properties": {
+                "balance": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.LossResponse": {
+            "type": "object",
+            "properties": {
+                "loss": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.UserResponse": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

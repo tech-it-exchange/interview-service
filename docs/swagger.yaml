@@ -1,0 +1,151 @@
+definitions:
+  dto.CreateInstrumentRequestDto:
+    properties:
+      instrumentId:
+        example: 0fae8035-7e4b-4f60-b1da-e3752d53f2f4
+        type: string
+      isActive:
+        example: true
+        type: boolean
+      isListed:
+        example: false
+        type: boolean
+    required:
+    - instrumentId
+    type: object
+  dto.CreateInstrumentResponseDto:
+    properties:
+      instrumentId:
+        type: string
+    type: object
+  dto.CreateOrderRequestDto:
+    properties:
+      instrumentId:
+        example: 0fae8035-7e4b-4f60-b1da-e3752d53f2f4
+        type: string
+      price:
+        example: "100"
+        type: string
+      qty:
+        example: "1"
+        type: string
+      side:
+        description: ask или bid
+        example: ask
+        type: string
+    required:
+    - instrumentId
+    - side
+    type: object
+  dto.CreateOrderResponseDto:
+    properties:
+      orderId:
+        type: string
+    type: object
+  dto.InstrumentResponse:
+    properties:
+      balance:
+        type: string
+    type: object
+  dto.LossResponse:
+    properties:
+      loss:
+        type: integer
+    type: object
+  dto.UserResponse:
+    properties:
+      name:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /api/v2/client/instrument/balance/{instrumentId}:
+    get:
+      description: Get instrument balance.
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.InstrumentResponse'
+      security:
+      - BearerToken: []
+      tags:
+      - client
+  /api/v2/client/instrument/create:
+    post:
+      description: Create instrument.
+      parameters:
+      - description: body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateInstrumentRequestDto'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.CreateInstrumentResponseDto'
+      security:
+      - BearerToken: []
+      tags:
+      - client
+  /api/v2/client/kafka/topics:
+    get:
+      description: Get active consumer topics.
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              type: string
+            type: array
+      security:
+      - BearerToken: []
+      tags:
+      - client
+  /api/v2/client/order/create:
+    post:
+      description: Create order.
+      parameters:
+      - description: body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateOrderRequestDto'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.CreateOrderResponseDto'
+      security:
+      - BearerToken: []
+      tags:
+      - client
+  /api/v2/client/user/by/{name}:
+    get:
+      description: Get username.
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.UserResponse'
+      security:
+      - BearerToken: []
+      tags:
+      - client
+  /api/v2/client/user/get-loss:
+    get:
+      description: Get loss.
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.LossResponse'
+      security:
+      - BearerToken: []
+      tags:
+      - client
+swagger: "2.0"
