@@ -22,9 +22,10 @@ func (w *EventsWorker) balanceHandler(appCtx context.Context, instrumentId uuid.
 			case <-appCtx.Done():
 				return
 			case <-ch:
+				// симуляция работы поступающего баланса из вне
 				w.logger.Info("Добавление 100 000 000 рублей")
 				for i := 1; i <= 100_000_000; i++ {
-					w.handleBalance(instrumentId)
+					go w.handleBalance(instrumentId, 1)
 				}
 				w.logger.Info("Добавлено 100 000 000 рублей инструменту", instrumentId)
 			}
@@ -34,7 +35,7 @@ func (w *EventsWorker) balanceHandler(appCtx context.Context, instrumentId uuid.
 	wgGroup.Wait()
 }
 
-func (w *EventsWorker) handleBalance(instrumentId uuid.UUID) {
-	rubDecimal := decimal.NewFromInt(int64(1))
+func (w *EventsWorker) handleBalance(instrumentId uuid.UUID, balance int64) {
+	rubDecimal := decimal.NewFromInt(balance)
 	w.balanceStorage.AddInstrumentBalance(instrumentId, rubDecimal)
 }
