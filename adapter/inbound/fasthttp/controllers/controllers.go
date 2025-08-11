@@ -1,10 +1,11 @@
 package controllers
 
 import (
-	"github.com/go-playground/validator/v10"
 	httpMappers "interview-service/adapter/inbound/fasthttp/mappers"
 	httpValidators "interview-service/adapter/inbound/fasthttp/validators"
 	"interview-service/application/usecase"
+
+	"github.com/go-playground/validator/v10"
 )
 
 type Controllers struct {

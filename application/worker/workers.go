@@ -8,7 +8,7 @@ import (
 	"interview-service/application/worker/abstract"
 	"interview-service/application/worker/cache"
 	"interview-service/application/worker/events"
-	"log/slog"
+	"log"
 	"time"
 )
 
@@ -20,7 +20,7 @@ type Workers struct {
 func NewWorkers(
 	storageContainer *localStorage.StorageContainer,
 	services *service.Services,
-	logger *slog.Logger,
+	logger *log.Logger,
 	refreshInstrumentsTimeout time.Duration,
 	workerChannelManager *channels.WorkerChannelManager,
 	instrumentChannelManager *channels.InstrumentChannelManager,

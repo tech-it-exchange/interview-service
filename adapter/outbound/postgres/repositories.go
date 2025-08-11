@@ -8,10 +8,10 @@ type Repositories struct {
 	User *repositories.UserRepository
 }
 
-func NewRepositories() *Repositories {
+func NewRepositories() Repositories {
 	user := repositories.NewUserRepository()
 
-	return &Repositories{
+	return Repositories{
 		User: user,
 	}
 }

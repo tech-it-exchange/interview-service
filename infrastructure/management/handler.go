@@ -2,18 +2,18 @@ package management
 
 import (
 	"fmt"
-	"log/slog"
+	"log"
 	"net/http"
 )
 
 type HandlerBuilder struct {
-	logger      *slog.Logger
+	logger      *log.Logger
 	port        string
 	swaggerUI   http.Handler
 	swaggerPath string
 }
 
-func NewHandlerBuilder(logger *slog.Logger, port string) *HandlerBuilder {
+func NewHandlerBuilder(logger *log.Logger, port string) *HandlerBuilder {
 	h := HandlerBuilder{
 		port:   port,
 		logger: logger,
@@ -27,7 +27,7 @@ func (h *HandlerBuilder) Build() {
 
 		if h.swaggerUI != nil {
 			handler.Handle(h.swaggerPath, h.swaggerUI)
-			h.logger.Debug("Swagger UI available", "port", h.port, "path", h.swaggerPath)
+			h.logger.Printf("Swagger UI available on port %s path %s", h.port, h.swaggerPath)
 		}
 
 		addr := fmt.Sprintf(":%s", h.port)

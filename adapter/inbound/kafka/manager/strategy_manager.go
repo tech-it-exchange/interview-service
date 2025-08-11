@@ -2,16 +2,16 @@ package manager
 
 import (
 	"interview-service/adapter/inbound/kafka/manager/abstract"
-	"log/slog"
+	"log"
 )
 
 type strategyManager struct {
 	handlers map[string]abstract.EventStrategyInterface
-	logger   *slog.Logger
+	logger   *log.Logger
 }
 
 func NewManager(
-	logger *slog.Logger,
+	logger *log.Logger,
 ) StrategyManagerInterface {
 
 	handlers := map[string]abstract.EventStrategyInterface{}
@@ -26,7 +26,7 @@ func NewManager(
 func (m *strategyManager) GetHandler(contractName string) abstract.EventStrategyInterface {
 	handler, ok := m.handlers[contractName]
 	if !ok {
-		m.logger.Warn("не найден обработчик для контракта", "contractName", contractName)
+		m.logger.Printf("не найден обработчик для контракта: %s", contractName)
 		return nil
 	}
 

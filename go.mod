@@ -1,8 +1,8 @@
 module interview-service
 
-go 1.23
+go 1.22.0
 
-toolchain go1.23.7
+toolchain go1.24.6
 
 require (
 	github.com/IBM/sarama v1.45.1

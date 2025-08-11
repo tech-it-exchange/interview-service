@@ -2,12 +2,13 @@ package events
 
 import (
 	"context"
-	"log/slog"
+	"log"
 
-	"github.com/google/uuid"
 	"interview-service/application/channels"
 	"interview-service/application/worker/abstract"
 	"interview-service/port/outbound/localStorage"
+
+	"github.com/google/uuid"
 )
 
 type EventsWorker struct {
@@ -16,7 +17,7 @@ type EventsWorker struct {
 	instrumentStorage        localStorage.InstrumentStorageInterface
 	instrumentChannelManager *channels.InstrumentChannelManager
 	balanceStorage           localStorage.BalanceStorageInterface
-	logger                   *slog.Logger
+	logger                   *log.Logger
 }
 
 func NewEventsWorker(
@@ -25,7 +26,7 @@ func NewEventsWorker(
 	instrumentStorage localStorage.InstrumentStorageInterface,
 	instrumentChannelManager *channels.InstrumentChannelManager,
 	balanceStorage localStorage.BalanceStorageInterface,
-	logger *slog.Logger,
+	logger *log.Logger,
 ) abstract.WorkerInterface {
 	return &EventsWorker{
 		workerChannelManager:     workerChannelManager,
@@ -56,20 +57,16 @@ func (w *EventsWorker) listenForNewSpotInstrument(appCtx context.Context) {
 	for {
 		select {
 		case <-appCtx.Done():
-			w.logger.Info("Остановка ListenForNewSpotInstrument:", appCtx.Err())
+			w.logger.Printf("Остановка ListenForNewSpotInstrument: %v", appCtx.Err())
 			return
 		case instrumentId, ok := <-w.instrumentChannelManager.GetSpotSyncEventInstrumentIdChannel():
 			if !ok {
-				w.logger.Error("Пропуск, канал новых спот инструментов закрыт")
+				w.logger.Printf("Пропуск, канал новых спот инструментов закрыт")
 				continue
 			}
 
 			if w.workerStorage.HasActiveSpotInstrument(instrumentId) {
-				w.logger.Info(
-					"Обработчики ивентов для спот инструмента уже существуют",
-					"instrumentId",
-					instrumentId,
-				)
+				w.logger.Printf("Обработчики ивентов для спот инструмента уже существуют: %s", instrumentId)
 
 				continue
 			}
@@ -77,7 +74,7 @@ func (w *EventsWorker) listenForNewSpotInstrument(appCtx context.Context) {
 			w.start(appCtx, instrumentId)
 			w.workerStorage.SaveActiveSpotInstrument(instrumentId)
 
-			w.logger.Info("Запущены обработчики ивентов для спот инструмента", "instrumentId", instrumentId)
+			w.logger.Printf("Запущены обработчики ивентов для спот инструмента: %s", instrumentId)
 		}
 	}
 }

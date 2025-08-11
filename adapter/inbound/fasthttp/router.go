@@ -3,7 +3,7 @@ package fasthttp
 const (
 	clientGroupPath = "/api/v2/client"
 
-	lossPath                 = "/user/getLoss"
+	lossPath                 = "/user/get-loss"
 	createOrderPath          = "/order/create"
 	createInstrumentPath     = "/instrument/create"
 	userNamePath             = "/user/by/{name}"
@@ -19,7 +19,7 @@ func (r *Router) InitRoutes() {
 
 	clientOrderController := r.controllers.ClientOrderController
 	{
-		clientGroup.POST(lossPath, clientOrderController.GetLoss)
+		clientGroup.GET(lossPath, clientOrderController.GetLoss)
 		clientGroup.POST(createOrderPath, clientOrderController.CreateOrder)
 		clientGroup.POST(createInstrumentPath, clientOrderController.CreateInstrument)
 		clientGroup.GET(userNamePath, clientOrderController.GetUserName)

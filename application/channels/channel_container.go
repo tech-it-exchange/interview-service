@@ -2,7 +2,7 @@ package channels
 
 import (
 	"interview-service/infrastructure/config"
-	"log/slog"
+	"log"
 )
 
 type ChannelContainer struct {
@@ -12,7 +12,7 @@ type ChannelContainer struct {
 
 func NewChannelContainer(
 	channelConfig config.ChannelConfig,
-	logger *slog.Logger,
+	logger *log.Logger,
 ) *ChannelContainer {
 	workerChannelManager := NewWorkerChannelManager(channelConfig, logger)
 	instrumentChannelManager := NewInstrumentChannelManager()

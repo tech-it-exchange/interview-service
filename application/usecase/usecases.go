@@ -3,7 +3,7 @@ package usecase
 import (
 	"interview-service/adapter/outbound/localStorage"
 	"interview-service/adapter/outbound/postgres"
-	"log/slog"
+	"log"
 )
 
 type UseCases struct {
@@ -13,11 +13,12 @@ type UseCases struct {
 func NewUseCases(
 	storageContainer *localStorage.StorageContainer,
 	repositories postgres.Repositories,
-	logger *slog.Logger,
+	logger *log.Logger,
 ) *UseCases {
 	calculateOrderUseCase := NewAppUseCase(
 		storageContainer.Instrument,
 		storageContainer.Balance,
+		storageContainer.Kafka,
 		repositories.User,
 		logger,
 	)

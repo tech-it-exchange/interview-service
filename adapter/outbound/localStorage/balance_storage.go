@@ -1,9 +1,10 @@
 package localStorage
 
 import (
+	"interview-service/port/outbound/localStorage"
+
 	"github.com/google/uuid"
 	"github.com/shopspring/decimal"
-	"interview-service/port/outbound/localStorage"
 )
 
 type balanceStorage struct {
@@ -17,7 +18,10 @@ func NewBalanceStorage() localStorage.BalanceStorageInterface {
 }
 
 func (s *balanceStorage) SaveInstrumentBalance(instrumentId uuid.UUID) {
-	s.balanceInstrumentsMap[instrumentId] = decimal.Zero
+	// Инициализируем баланс нулем, если не существует
+	if _, ok := s.balanceInstrumentsMap[instrumentId]; !ok {
+		s.balanceInstrumentsMap[instrumentId] = decimal.Zero
+	}
 }
 
 func (s *balanceStorage) GetInstrumentBalance(instrumentId uuid.UUID) decimal.Decimal {
@@ -25,9 +29,6 @@ func (s *balanceStorage) GetInstrumentBalance(instrumentId uuid.UUID) decimal.De
 }
 
 func (s *balanceStorage) AddInstrumentBalance(instrumentId uuid.UUID, balance decimal.Decimal) {
-	cacheBalance := s.balanceInstrumentsMap[instrumentId]
-
-	cacheBalance.Add(balance)
-
-	s.balanceInstrumentsMap[instrumentId] = cacheBalance
+	current := s.balanceInstrumentsMap[instrumentId]
+	s.balanceInstrumentsMap[instrumentId] = current.Add(balance)
 }

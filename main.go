@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/valyala/fasthttp"
 	appFasthttp "interview-service/adapter/inbound/fasthttp"
 	"interview-service/adapter/inbound/fasthttp/controllers"
 	inboundKafka "interview-service/adapter/inbound/kafka"
@@ -14,24 +13,32 @@ import (
 	"interview-service/application/service"
 	"interview-service/application/usecase"
 	"interview-service/application/worker"
+	_ "interview-service/docs"
 	microserviceConfig "interview-service/infrastructure/config"
 	fasthttp2 "interview-service/infrastructure/fasthttp"
 	"interview-service/infrastructure/management"
-	"log/slog"
+	"log"
 	"os"
+
+	"github.com/joho/godotenv"
+	"github.com/valyala/fasthttp"
 )
 
+func init() {
+	// Грузим локальные env без выхода за пределы проекта
+	if err := godotenv.Load(".env.local", ".env"); err != nil {
+		log.Print("No .env file found")
+	}
+}
+
 func main() {
+
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
 	config := microserviceConfig.GetConfig()
 
-	handler := slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
-		Level: slog.LevelDebug,
-	})
-
-	logger := slog.New(handler)
+	logger := log.New(os.Stdout, "[app] ", log.LstdFlags)
 
 	management.NewHandlerBuilder(logger, config.Management.ManagementPort).
 		AddSwaggerUIHandler(management.SwaggerConfig{
@@ -79,13 +86,13 @@ func main() {
 
 	err := kafkaAdapter.InitConsumers()
 	if err != nil {
-		logger.Error("Ошибка инициализации потребителей кафки", "err", err)
+		logger.Printf("Ошибка инициализации потребителей кафки: %v", err)
 
 		return
 	}
 	err = kafkaAdapter.StartConsuming()
 	if err != nil {
-		logger.Error("Ошибка запуска потребителей кафки", "err", err)
+		logger.Printf("Ошибка запуска потребителей кафки: %v", err)
 
 		return
 	}
@@ -107,13 +114,13 @@ func main() {
 func startHttpServer(
 	controllerDependencies *controllers.Dependencies,
 	config *microserviceConfig.MicroserviceConfig,
-	logger *slog.Logger,
+	logger *log.Logger,
 ) {
 	httpAdapter, err := appFasthttp.NewHttpAdapter(
 		controllerDependencies,
 	)
 	if err != nil {
-		logger.Error("Ошибка инициализации http адаптера", "err", err)
+		logger.Printf("Ошибка инициализации http адаптера: %v", err)
 
 		return
 	}
@@ -123,11 +130,11 @@ func startHttpServer(
 	port := fmt.Sprintf(":%s", config.HttpServer.HttpPort)
 	handler := fasthttp2.NewHandler(logger, routerHandler)
 
-	logger.Info("Запуск http сервера", "port", port)
+	logger.Printf("Запуск http сервера на порту %s", port)
 	err = fasthttp.ListenAndServe(port, handler)
 	if err != nil {
 		err = fmt.Errorf("не удалось запустить HTTP-сервер, err: %v", err)
-		logger.Error(err.Error(), "err", err)
+		logger.Printf(err.Error())
 
 		panic(err)
 	}

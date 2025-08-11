@@ -1,24 +1,25 @@
 package channels
 
 import (
-	"github.com/google/uuid"
 	"interview-service/infrastructure/config"
-	"log/slog"
+	"log"
 	"sync"
+
+	"github.com/google/uuid"
 )
 
 type WorkerChannelManager struct {
 	balanceChannel map[uuid.UUID]chan struct{}
 
 	channelConfig config.ChannelConfig
-	logger        *slog.Logger
+	logger        *log.Logger
 
 	mutex sync.RWMutex
 }
 
 func NewWorkerChannelManager(
 	channelConfig config.ChannelConfig,
-	logger *slog.Logger,
+	logger *log.Logger,
 ) *WorkerChannelManager {
 	return &WorkerChannelManager{
 		balanceChannel: make(map[uuid.UUID]chan struct{}, channelConfig.BalanceChannelBufferSize),
@@ -47,8 +48,7 @@ func (m *WorkerChannelManager) TriggerBalance(instrumentId uuid.UUID) {
 	m.mutex.RUnlock()
 
 	if !ok {
-		m.logger.Error("Не найден триггер канал balanceChannel по instrumentId", instrumentId)
-
+		m.logger.Printf("Не найден триггер канал balanceChannel по instrumentId: %s", instrumentId)
 		return
 	}
 

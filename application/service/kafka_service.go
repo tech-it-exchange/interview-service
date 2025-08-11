@@ -2,22 +2,23 @@ package service
 
 import (
 	"fmt"
-	"github.com/google/uuid"
 	"interview-service/adapter/inbound/kafka/consumer"
 	"interview-service/port/outbound/localStorage"
-	"log/slog"
+	"log"
+
+	"github.com/google/uuid"
 )
 
 type KafkaService struct {
 	instrumentStorage localStorage.InstrumentStorageInterface
 	kafkaStorage      localStorage.KafkaStorageInterface
-	logger            *slog.Logger
+	logger            *log.Logger
 }
 
 func NewKafkaService(
 	instrumentStorage localStorage.InstrumentStorageInterface,
 	kafkaStorage localStorage.KafkaStorageInterface,
-	logger *slog.Logger,
+	logger *log.Logger,
 ) *KafkaService {
 	return &KafkaService{
 		instrumentStorage: instrumentStorage,

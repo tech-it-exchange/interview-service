@@ -8,9 +8,8 @@ type SwaggerConfig struct {
 }
 
 func (h *HandlerBuilder) AddSwaggerUIHandler(config SwaggerConfig) *HandlerBuilder {
-	h.swaggerUI = httpSwagger.Handler(
-		httpSwagger.URL(config.SwaggerUrl),
-	)
+	// Используем встроенный doc.json по умолчанию, чтобы UI и JSON отдавались по одному и тому же пути
+	h.swaggerUI = httpSwagger.Handler()
 	h.swaggerPath = config.SwaggerPath
 	return h
 }

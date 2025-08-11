@@ -7,7 +7,7 @@ import (
 	"interview-service/application/worker/abstract"
 	"interview-service/domain"
 	localStoragePort "interview-service/port/outbound/localStorage"
-	"log/slog"
+	"log"
 	"time"
 )
 
@@ -17,7 +17,7 @@ type InstrumentCacheWorker struct {
 	instrumentChannelManager  *channels.InstrumentChannelManager
 	kafkaService              *service.KafkaService
 	workerStorage             localStoragePort.WorkerStorageInterface
-	logger                    *slog.Logger
+	logger                    *log.Logger
 }
 
 func NewInstrumentCacheWorker(
@@ -26,7 +26,7 @@ func NewInstrumentCacheWorker(
 	instrumentChannelManager *channels.InstrumentChannelManager,
 	kafkaService *service.KafkaService,
 	workerStorage localStoragePort.WorkerStorageInterface,
-	logger *slog.Logger,
+	logger *log.Logger,
 ) abstract.WorkerInterface {
 	return &InstrumentCacheWorker{
 		instrumentStorage:         instrumentStorage,
@@ -53,7 +53,7 @@ func (w *InstrumentCacheWorker) updateInstrumentsData(appCtx context.Context) {
 	for {
 		select {
 		case <-appCtx.Done():
-			w.logger.Info("Контекст отменён, остановка обновления инструментов из redis")
+			w.logger.Printf("Контекст отменён, остановка обновления инструментов из redis")
 
 			return
 		case <-ticker.C:

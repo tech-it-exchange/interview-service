@@ -2,24 +2,25 @@ package handlers
 
 import (
 	"context"
+	"interview-service/adapter/inbound/kafka/manager"
+	"log"
+
 	"github.com/IBM/sarama"
 	libJson "github.com/tidwall/gjson"
-	"interview-service/adapter/inbound/kafka/manager"
-	"log/slog"
 )
 
 type CommonHandler struct {
 	strategyManager manager.StrategyManagerInterface
 	topic           string
 	messageMode     string
-	logger          *slog.Logger
+	logger          *log.Logger
 }
 
 func NewCommonHandler(
 	strategyManager manager.StrategyManagerInterface,
 	topic string,
 	messageMode string,
-	logger *slog.Logger,
+	logger *log.Logger,
 ) *CommonHandler {
 	return &CommonHandler{
 		strategyManager: strategyManager,

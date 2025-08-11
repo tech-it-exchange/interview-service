@@ -2,7 +2,7 @@ package service
 
 import (
 	"interview-service/adapter/outbound/localStorage"
-	"log/slog"
+	"log"
 )
 
 type Services struct {
@@ -10,7 +10,7 @@ type Services struct {
 }
 
 func NewServices(
-	logger *slog.Logger,
+	logger *log.Logger,
 	storages *localStorage.StorageContainer,
 ) *Services {
 	kafkaService := NewKafkaService(

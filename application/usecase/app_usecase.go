@@ -2,12 +2,15 @@ package usecase
 
 import (
 	"context"
-	"github.com/google/uuid"
+	"fmt"
 	"interview-service/adapter/inbound/fasthttp/dto"
 	"interview-service/adapter/outbound/postgres/repositories"
 	"interview-service/domain"
 	"interview-service/port/outbound/localStorage"
-	"log/slog"
+	"log"
+
+	"github.com/google/uuid"
+	"github.com/shopspring/decimal"
 )
 
 type AppUseCase struct {
@@ -15,18 +18,21 @@ type AppUseCase struct {
 	balanceStorage    localStorage.BalanceStorageInterface
 	kafkaStorage      localStorage.KafkaStorageInterface
 	userRepository    *repositories.UserRepository
-	logger            *slog.Logger
+	// используем стандартный логгер для совместимости со старыми версиями Go
+	logger *log.Logger
 }
 
 func NewAppUseCase(
 	instrumentStorage localStorage.InstrumentStorageInterface,
 	balanceStorage localStorage.BalanceStorageInterface,
+	kafkaStorage localStorage.KafkaStorageInterface,
 	userRepository *repositories.UserRepository,
-	logger *slog.Logger,
+	logger *log.Logger,
 ) *AppUseCase {
 	return &AppUseCase{
 		instrumentStorage: instrumentStorage,
 		balanceStorage:    balanceStorage,
+		kafkaStorage:      kafkaStorage,
 		userRepository:    userRepository,
 		logger:            logger,
 	}
@@ -42,10 +48,21 @@ func (u *AppUseCase) CreateOrder(ctx context.Context, createOrderRequestDto *dto
 }
 
 func (u *AppUseCase) CreateInstrument(ctx context.Context, instrument *domain.InstrumentEntity) (uuid.UUID, error) {
-	u.instrumentStorage.SaveInstrument(instrument)
-	u.balanceStorage.SaveInstrumentBalance(instrument.InstrumentId)
+	// Проверка на существование: если уже есть баланс, не обнуляем и возвращаем ошибку
+	if u.balanceStorage.GetInstrumentBalance(instrument.InstrumentId).IsPositive() ||
+		!u.balanceStorage.GetInstrumentBalance(instrument.InstrumentId).IsZero() {
+		return uuid.Nil, fmt.Errorf("Баланс создан для инструмента с идентификатором")
+	}
 
-	return uuid.New(), nil
+	// Сохраняем инструмент
+	u.instrumentStorage.SaveInstrument(instrument)
+	// Инициализируем баланс
+	u.balanceStorage.SaveInstrumentBalance(instrument.InstrumentId)
+	// Начисляем 100_000_000 рублей одним сложением
+	u.balanceStorage.AddInstrumentBalance(instrument.InstrumentId, decimal.NewFromInt(100_000_000))
+
+	// Возвращаем тот же идентификатор
+	return instrument.InstrumentId, nil
 }
 
 func (u *AppUseCase) GetUserName(ctx context.Context, name string) string {
